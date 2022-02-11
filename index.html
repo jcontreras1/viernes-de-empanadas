@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+	<title>Selector de Empanadas</title>
+	<script type="text/javascript" src="comensal.js"></script>
+	<script type="text/javascript" src="empanadas.js"></script>
+	<script type="text/javascript" src="pedido.js"></script>
+	<style type="text/css">
+		.card{
+			border-left: 3px solid #44bcd8;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="py-4"></div>
+		<input type="text" name="" placeholder="Nombre del Comensal" autofocus="" class="form-control input-sm" id="comensal">
+		<div class="py-4"></div>
+		<div class="row" id="seccion_comensales"></div>
+		<div class="py-1"></div>
+		<div class="row" id="seccion_pedido"></div>
+	</div>
+
+
+	<script type="text/javascript">
+
+		let id_pedido = new Date().toISOString().slice(0, 10).replaceAll('-', '');
+		let pedido_del_dia = {};
+
+		function actualizar_empanadas(elem){
+			let cantidad = elem.value;
+			if(cantidad == 0)
+				return;
+			let tipo_empanada = elem.dataset.empanada;
+			let comensal = elem.dataset.comensal;
+			
+			var empanadas_del_tipo = document.getElementsByClassName("empanada_chg");
+			aux_cantidad = 0;
+			Array.prototype.forEach.call(empanadas_del_tipo, function(el) {
+				if(el.dataset.empanada == tipo_empanada){
+					aux_cantidad += parseInt(el.value);
+				}
+				pedido_del_dia[tipo_empanada] = parseInt(aux_cantidad);
+			});
+			localStorage[id_pedido] = JSON.stringify(pedido_del_dia);
+			redibujar_pedido(id_pedido);
+
+		}
+
+		function agregar_comensal(comensal, id_pedido){
+			// localStorage.(comensal);
+			let nuevo_comensal = document.createElement("comensal-element");
+			nuevo_comensal.setAttribute('name', comensal);
+			nuevo_comensal.className = 'col-12 col-md-3';
+			seccion_comensales.appendChild(nuevo_comensal);
+		}
+
+		function redibujar_pedido(id_pedido){
+			let empanadas_del_dia = localStorage.getItem(id_pedido);
+			if(!empanadas_del_dia)
+				return;
+
+			let pedido = document.createElement("pedido-element");
+			pedido.setAttribute('pedido', empanadas_del_dia);
+			pedido.className = 'col-12';
+			let seccion_pedido = document.getElementById('seccion_pedido');
+			seccion_pedido.innerHTML = "";
+			seccion_pedido.appendChild(pedido);	
+
+		}
+
+
+		window.onload = function(){
+			
+			let empanadas_del_dia = localStorage.getItem(id_pedido);
+			if(empanadas_del_dia)
+				redibujar_pedido(id_pedido);
+			let input_comensal = document.getElementById('comensal');
+			let seccion_comensales = document.getElementById('seccion_comensales');
+
+			input_comensal.addEventListener("keyup", function(event) {
+				if (event.keyCode === 13) {
+					event.preventDefault();
+					nombre = input_comensal.value;
+					input_comensal.value = "";
+					agregar_comensal(nombre, id_pedido);
+				}
+			});
+		}
+
+	</script>
+
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+</body>
+</html>
